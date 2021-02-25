@@ -1,5 +1,5 @@
-function countSubStr(ititialStr, str) {
-  return (ititialStr.match(new RegExp(str, 'g')) || []).length
+function findSubString(str, subStr){
+    return str.split(subStr).length - 1;
 }
 
-console.log(countSubStr('test|testTest test', 'test'))
+console.log(findSubString('test|testTest test testtestt', 'test'))
