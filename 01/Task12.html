@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task 12</title>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    function handleError(err){
+        console.log(`An error has occurred: ${err}`);
+    }
+
+    async function request(url, method = "GET", data = null){
+        const headers = {};
+        let body;
+        if (data){
+            headers["Content-Type"] = "application/json";
+            body = JSON.stringify(data);
+        }
+        const response =  await fetch(url, {
+            method,
+            headers,
+            body
+        });
+        return response.json();
+    }
+
+    let minsk = request('http://geocode.xyz/Minsk?json=1&auth=113625119317144148813x3636');
+    let madrid = request('http://geocode.xyz/Madrid?json=1&auth=113625119317144148813x3636');
+    let rome = request('http://geocode.xyz/Rome?json=1&auth=113625119317144148813x3636');
+
+    Promise.all([minsk, madrid, rome]).then(values => {
+        values.forEach(item => {
+            console.log(`${item.standard.city} - ${item.standard.countryname}`);
+        })
+    }).catch(err => handleError(err));
+
+    let paris = request('http://geocode.xyz/Paris?json=1&auth=113625119317144148813x3636');
+    let nice = request('http://geocode.xyz/Nice?json=1&auth=113625119317144148813x3636');
+
+    Promise.race([paris, nice]).then(value => {
+        console.log(value.standard.countryname);
+    }).catch(err => handleError(err));
+
+    function returnPromise(cityName){
+        return new Promise((resolve, reject) => {
+           return setTimeout(resolve, 3000, cityName);
+        });
+    }
+    let minskPromise = returnPromise(minsk)
+                        .then()
+                        .then((city) => request(`http://geocode.xyz/${city.standard.city[0].toUpperCase() + city.standard.city.substring(1)}?json=1&auth=113625119317144148813x3636`))
+                        .then(cityObj => cityObj.standard).catch(err => handleError(err));
+    let parisPromise = returnPromise(paris)
+        .then()
+        .then((city) => request(`http://geocode.xyz/${city.standard.city[0].toUpperCase() + city.standard.city.substring(1)}?json=1&auth=113625119317144148813x3636`))
+        .then(cityObj => cityObj.standard).catch(err => handleError(err));
+    let nicePromise = returnPromise(nice)
+        .then()
+        .then((city) => request(`http://geocode.xyz/${city.standard.city[0].toUpperCase() + city.standard.city.substring(1)}?json=1&auth=113625119317144148813x3636`))
+        .then(cityObj => cityObj.standard).catch(err => handleError(err));
+
+    Promise.all([minskPromise, parisPromise, nicePromise]).then(values => {
+        values.forEach((item) => {
+            console.log(item.countryname, ':', item.city);
+        });
+    }).catch(err => handleError(err));
+	
+</script>
+</body>
+</html>
