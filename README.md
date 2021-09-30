@@ -1,3 +1,3 @@
-# LeverX-NodeJS-HomeWork #
+# LeverX-NodeJS-Homework #
 
 ## Osipik Ivan ##
